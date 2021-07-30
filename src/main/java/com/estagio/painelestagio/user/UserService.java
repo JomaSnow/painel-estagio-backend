@@ -1,0 +1,39 @@
+package com.estagio.painelestagio.user;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    public void addNewUser(User user) {
+        Optional<User> userOptional = userRepository.findUserByMatricula(user.getMatricula());
+        if (userOptional.isPresent()) {
+            throw new IllegalStateException("Aatricula já existe.");
+        }
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long userId) {
+        boolean exists = userRepository.existsById(userId);
+
+        if (!exists) {
+            throw new IllegalStateException("Usuário com id " + userId + " não existe.");
+        }
+        userRepository.deleteById(userId);
+    }
+}
